@@ -4,7 +4,6 @@ import { Fragment } from 'react';
 import { EventContent } from '../../components/events/event-detail/event-content/event-content';
 import { EventLogistics } from '../../components/events/event-detail/event-logistics/event-logistics';
 import { EventSummary } from '../../components/events/event-detail/event-summary/event-summary';
-import { Button } from '../../components/ui/button/button';
 import { ErrorAlert } from '../../components/ui/error-alert/error-alert';
 
 import { getEventById } from '../../dummy-data';
