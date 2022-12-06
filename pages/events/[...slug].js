@@ -1,33 +1,16 @@
 import { Fragment } from 'react';
-import { useRouter } from 'next/router';
 
-import { getFilteredEvents } from '../../dummy-data';
+import { getFilteredEventsFirebase } from '../../helpers/api-util';
 
 import { EventList } from '../../components/events/event-list/event-list';
 import { ResultsTitle } from '../../components/events/results-title/results-title';
 import { Button } from '../../components/ui/button/button';
 import { ErrorAlert } from '../../components/ui/error-alert/error-alert';
 
-const FilteredEvents = () => {
-  const router = useRouter();
+const FilteredEvents = (props) => {
+  const { filteredEvents, filteredDate, hasError } = props;
 
-  const filterData = router.query.slug;
-
-  if (!filterData) {
-    return <p className="center">Loading...</p>;
-  }
-
-  const filteredYear = Number(filterData[0]);
-  const filteredMonth = Number(filterData[1]);
-
-  if (
-    isNaN(filteredYear) ||
-    isNaN(filteredMonth) ||
-    filteredYear > 2030 ||
-    filteredYear < 2021 ||
-    filteredMonth < 1 ||
-    filteredMonth > 12
-  ) {
+  if (hasError) {
     return (
       <Fragment>
         <ErrorAlert>
@@ -39,8 +22,6 @@ const FilteredEvents = () => {
       </Fragment>
     );
   }
-
-  const filteredEvents = getFilteredEvents({ year: filteredYear, month: filteredMonth });
 
   const noEvents = !filteredEvents || filteredEvents.length === 0;
 
@@ -57,7 +38,7 @@ const FilteredEvents = () => {
     );
   }
 
-  const date = new Date(filteredYear, filteredMonth - 1);
+  const date = new Date(filteredDate.year, filteredDate.month - 1);
 
   return (
     <Fragment>
@@ -68,3 +49,39 @@ const FilteredEvents = () => {
 };
 
 export default FilteredEvents;
+
+export async function getServerSideProps(context) {
+  const { params } = context;
+  const filterData = params.slug;
+
+  const filteredYear = Number(filterData[0]);
+  const filteredMonth = Number(filterData[1]);
+
+  if (
+    isNaN(filteredYear) ||
+    isNaN(filteredMonth) ||
+    filteredYear > 2030 ||
+    filteredYear < 2021 ||
+    filteredMonth < 1 ||
+    filteredMonth > 12
+  ) {
+    return {
+      props: { hasError: true },
+    };
+  }
+
+  const filteredEvents = await getFilteredEventsFirebase({
+    year: filteredYear,
+    month: filteredMonth,
+  });
+
+  return {
+    props: {
+      filteredEvents,
+      filteredDate: {
+        year: filteredYear,
+        month: filteredMonth,
+      },
+    },
+  };
+}

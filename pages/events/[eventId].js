@@ -1,23 +1,20 @@
-import { useRouter } from 'next/router';
 import { Fragment } from 'react';
 
 import { EventContent } from '../../components/events/event-detail/event-content/event-content';
 import { EventLogistics } from '../../components/events/event-detail/event-logistics/event-logistics';
 import { EventSummary } from '../../components/events/event-detail/event-summary/event-summary';
 import { ErrorAlert } from '../../components/ui/error-alert/error-alert';
+import { getEventByIdFirebase, getFeaturedEventsFirebase } from '../../helpers/api-util';
 
-import { getEventById } from '../../dummy-data';
-
-const EventDetail = () => {
-  const router = useRouter();
-
-  const eventId = router.query.eventId;
-  const event = getEventById(eventId);
+const EventDetail = (props) => {
+  const { event } = props;
 
   if (!event) {
-    <ErrorAlert>
-      <p>No event found!</p>
-    </ErrorAlert>;
+    return (
+      <ErrorAlert>
+        <p>Loading...</p>
+      </ErrorAlert>
+    );
   }
 
   return (
@@ -37,3 +34,32 @@ const EventDetail = () => {
 };
 
 export default EventDetail;
+
+export async function getStaticProps(context) {
+  const eventId = context.params.eventId;
+  const event = await getEventByIdFirebase(eventId);
+
+  if (!event) {
+    return {
+      notFound: true,
+    };
+  }
+
+  return {
+    props: {
+      event,
+    },
+    revalidate: 30,
+  };
+}
+
+export async function getStaticPaths() {
+  const events = await getFeaturedEventsFirebase();
+
+  const paths = events.map((event) => ({ params: { eventId: 'e1' } }));
+
+  return {
+    paths,
+    fallback: true,
+  };
+}

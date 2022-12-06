@@ -1,26 +1,26 @@
-import { Fragment } from 'react';
-import { useRouter } from 'next/router';
+import { getFeaturedEventsFirebase } from '../helpers/api-util';
 
 import { EventList } from '../components/events/event-list/event-list';
-import { EventsSearch } from '../components/events/events-search/events-search';
-import { getFeaturedEvents } from '../dummy-data';
 
-const HomePage = () => {
-  const featuredEvents = getFeaturedEvents();
-  const router = useRouter();
-
-  const findEventsHandler = (year, month) => {
-    const fullPath = `/events/${year}/${month}`;
-
-    router.push(fullPath);
-  };
+const HomePage = (props) => {
+  const { events } = props;
 
   return (
-    <Fragment>
-      <EventsSearch onSearchAction={findEventsHandler} />
-      <EventList items={featuredEvents} />
-    </Fragment>
+    <div>
+      <EventList items={events} />
+    </div>
   );
 };
 
 export default HomePage;
+
+export async function getStaticProps() {
+  const featuredEvents = await getFeaturedEventsFirebase();
+
+  return {
+    props: {
+      events: featuredEvents,
+    },
+    revalidate: 30,
+  };
+}
