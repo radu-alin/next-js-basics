@@ -2,6 +2,8 @@ import { Fragment } from 'react';
 
 import { getFilteredEventsFirebase } from '../../helpers/api-util';
 
+import Head from 'next/head';
+
 import { EventList } from '../../components/events/event-list/event-list';
 import { ResultsTitle } from '../../components/events/results-title/results-title';
 import { Button } from '../../components/ui/button/button';
@@ -42,6 +44,13 @@ const FilteredEvents = (props) => {
 
   return (
     <Fragment>
+      <Head>
+        <meta
+          name="description"
+          content={`All events for ${filteredDate.month}/${filteredDate.year}`}
+        />
+        <title>Filtered Events</title>
+      </Head>
       <ResultsTitle date={date} />
       <EventList items={filteredEvents} />
     </Fragment>

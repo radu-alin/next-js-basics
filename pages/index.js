@@ -1,3 +1,5 @@
+import Head from 'next/head';
+
 import { getFeaturedEventsFirebase } from '../helpers/api-util';
 
 import { EventList } from '../components/events/event-list/event-list';
@@ -7,6 +9,13 @@ const HomePage = (props) => {
 
   return (
     <div>
+      <Head>
+        <meta
+          name="description"
+          content="Find a lot of great events that allow you to evolve..."
+        />
+        <title>NextJS Events</title>
+      </Head>
       <EventList items={events} />
     </div>
   );

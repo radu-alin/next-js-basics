@@ -1,3 +1,5 @@
+import Image from 'next/image';
+
 import { Button } from '../../ui/button/button';
 
 import { DateIcon } from '../../icons/date-icon';
@@ -22,7 +24,8 @@ export const EventItem = (props) => {
   return (
     <li className={classes.item}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={'/' + image} alt={title} />
+      <Image src={'/' + image} alt={title} width={250} height={160} priority />
+      {/* <img src={'/' + image} alt={title} /> */}
       <div className={classes.content}>
         <div className={classes.summary}>
           <h2>{title}</h2>

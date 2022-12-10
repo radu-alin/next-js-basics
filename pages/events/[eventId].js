@@ -1,5 +1,6 @@
 import { Fragment } from 'react';
 
+import Head from 'next/head';
 import { EventContent } from '../../components/events/event-detail/event-content/event-content';
 import { EventLogistics } from '../../components/events/event-detail/event-logistics/event-logistics';
 import { EventSummary } from '../../components/events/event-detail/event-summary/event-summary';
@@ -19,6 +20,10 @@ const EventDetail = (props) => {
 
   return (
     <Fragment>
+      <Head>
+        <meta name="description" content={event.description} />
+        <title>{event.title}</title>
+      </Head>
       <EventSummary title={event.title} />
       <EventLogistics
         title={event.title}
