@@ -3,6 +3,7 @@ import Head from 'next/head';
 import { getFeaturedEventsFirebase } from '../helpers/api-util';
 
 import { EventList } from '../components/events/event-list/event-list';
+import NewsletterRegistration from '../components/input/newsletter-registration';
 
 const HomePage = (props) => {
   const { events } = props;
@@ -16,6 +17,7 @@ const HomePage = (props) => {
         />
         <title>NextJS Events</title>
       </Head>
+      <NewsletterRegistration />
       <EventList items={events} />
     </div>
   );

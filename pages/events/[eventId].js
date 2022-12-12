@@ -1,11 +1,13 @@
 import { Fragment } from 'react';
-
 import Head from 'next/head';
+
+import { getEventByIdFirebase, getFeaturedEventsFirebase } from '../../helpers/api-util';
+
 import { EventContent } from '../../components/events/event-detail/event-content/event-content';
 import { EventLogistics } from '../../components/events/event-detail/event-logistics/event-logistics';
 import { EventSummary } from '../../components/events/event-detail/event-summary/event-summary';
 import { ErrorAlert } from '../../components/ui/error-alert/error-alert';
-import { getEventByIdFirebase, getFeaturedEventsFirebase } from '../../helpers/api-util';
+import Comments from '../../components/input/comments';
 
 const EventDetail = (props) => {
   const { event } = props;
@@ -34,6 +36,7 @@ const EventDetail = (props) => {
       <EventContent>
         <p>{event.description}</p>
       </EventContent>
+      <Comments eventId={event.id} />
     </Fragment>
   );
 };
