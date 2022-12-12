@@ -4,6 +4,24 @@ import CommentList from './comment-list';
 import NewComment from './new-comment';
 import classes from './comments.module.css';
 
+const getCommentsHelper = async (eventId) => {
+  const response = await fetch('/api/comments/' + eventId, {
+    method: 'GET',
+  });
+  const data = await response.json();
+  return data.comments;
+};
+
+const addCommentHelper = async (eventId, commentData) => {
+  return await fetch('/api/comments/' + eventId, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(commentData),
+  });
+};
+
 function Comments(props) {
   const { eventId } = props;
 
@@ -11,12 +29,12 @@ function Comments(props) {
   const [comments, setComments] = useState([]);
 
   useEffect(() => {
+    const loadComents = async () => {
+      const comments = await getCommentsHelper(eventId);
+      setComments(comments);
+    };
     if (showComments) {
-      fetch('/api/comments/' + eventId, {
-        method: 'GET',
-      })
-        .then((response) => response.json())
-        .then((data) => setComments(data.comments));
+      loadComents();
     }
   }, [showComments, eventId]);
 
@@ -24,19 +42,12 @@ function Comments(props) {
     setShowComments((prevStatus) => !prevStatus);
   }
 
-  function addCommentHandler(commentData) {
-    // send data to API
-    fetch('/api/comments/' + eventId, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(commentData),
-    })
-      .then((response) => response.json())
-      .then((data) =>
-        console.log('%c-> developmentConsole: data= ', 'color:#77dcfd', data)
-      );
+  async function addCommentHandler(commentData) {
+    await addCommentHelper(eventId, commentData);
+
+    const comments = await getCommentsHelper(eventId);
+
+    setComments(comments);
   }
 
   return (
