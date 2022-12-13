@@ -4,7 +4,6 @@ async function handler(req, res) {
   switch (req.method) {
     case 'POST': {
       const userEmail = req.body.email;
-      console.log('%c-> developmentConsole: userEmail= ', 'color:#77dcfd', userEmail);
 
       if (!userEmail || !userEmail.includes('@')) {
         res.status(422).json({

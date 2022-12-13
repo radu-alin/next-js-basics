@@ -1,37 +1,28 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+
+import NotificationContext from '../../store/notification-context';
+import { addCommentAPI, getCommentsAPI } from '../../api';
 
 import CommentList from './comment-list';
 import NewComment from './new-comment';
+
 import classes from './comments.module.css';
-
-const getCommentsHelper = async (eventId) => {
-  const response = await fetch('/api/comments/' + eventId, {
-    method: 'GET',
-  });
-  const data = await response.json();
-  return data.comments;
-};
-
-const addCommentHelper = async (eventId, commentData) => {
-  return await fetch('/api/comments/' + eventId, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(commentData),
-  });
-};
 
 function Comments(props) {
   const { eventId } = props;
 
+  const notificationCtx = useContext(NotificationContext);
+
   const [showComments, setShowComments] = useState(false);
   const [comments, setComments] = useState([]);
+  const [isLoadingComments, setIsLoadingComments] = useState(false);
 
   useEffect(() => {
     const loadComents = async () => {
-      const comments = await getCommentsHelper(eventId);
+      setIsLoadingComments(true);
+      const comments = await getCommentsAPI(eventId);
       setComments(comments);
+      setIsLoadingComments(false);
     };
     if (showComments) {
       loadComents();
@@ -43,20 +34,46 @@ function Comments(props) {
   }
 
   async function addCommentHandler(commentData) {
-    await addCommentHelper(eventId, commentData);
+    notificationCtx.showNotification({
+      title: 'Sending comment...',
+      message: 'Youre comment is currently saved.',
+      status: 'pending',
+    });
 
-    const comments = await getCommentsHelper(eventId);
+    try {
+      const response = await addCommentAPI(eventId, commentData);
+      if (response.ok) {
+        const comments = await getCommentsAPI(eventId);
+        setComments(comments);
 
-    setComments(comments);
+        notificationCtx.showNotification({
+          title: 'Success',
+          message: 'Your comment has been saved!',
+          status: 'success',
+        });
+      } else {
+        throw new Error(response.message || 'Something went wrong.');
+      }
+    } catch (error) {
+      notificationCtx.showNotification({
+        title: 'Error',
+        message: error.message || 'Something went wrong!',
+        status: 'error',
+      });
+    }
   }
+
+  const isLoading = showComments && isLoadingComments;
+  const isComments = showComments && !isLoadingComments;
 
   return (
     <section className={classes.comments}>
       <button onClick={toggleCommentsHandler}>
         {showComments ? 'Hide' : 'Show'} Comments
       </button>
-      {showComments && <NewComment onAddComment={addCommentHandler} />}
-      {showComments && <CommentList items={comments} />}
+      {isLoading && <p>Loading comments...</p>}
+      {isLoading && <NewComment onAddComment={addCommentHandler} />}
+      {isComments && <CommentList items={comments} />}
     </section>
   );
 }
