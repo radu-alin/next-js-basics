@@ -1,0 +1,10 @@
+Info
+
+tutorial: https://www.udemy.com/course/nextjs-react-the-complete-guide/learn/lecture/25145510#overview
+
+github: https://github.com/radu-alin/next-js-basics.git
+
+app: events
+
+github
+-
